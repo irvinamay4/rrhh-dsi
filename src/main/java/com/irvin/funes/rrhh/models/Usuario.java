@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "usuarios")
@@ -66,7 +68,11 @@ public class Usuario {
     @JoinColumn(name = "nocturnas_id", referencedColumnName = "id") //Para que se agregue una columna usuario_id a la tabla HorasNocturnas
     private HorasNocturnas horasNocturnas;
 
-    public Usuario(Long id, PlanillaEmpleado planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas, String nombre, String email, String password, String telefono, String direccion, String edad, String dui, String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto) {
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = RolesUsuario.class, cascade = CascadeType.PERSIST)//eager para que al consultar un user me traiga todos los roles de una vez, lazy seria 1 por 1
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<RolesUsuario> roles;
+
+    public Usuario(Long id, PlanillaEmpleado planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas, String nombre, String email, String password, String telefono, String direccion, String edad, String dui, String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto, Set<RolesUsuario> roles) {
         this.id = id;
         this.planillaEmpleado = planillaEmpleado;
         this.horasDiurnas = horasDiurnas;
@@ -83,6 +89,7 @@ public class Usuario {
         this.fecha_ingreso = fecha_ingreso;
         this.salario = salario;
         this.salario_neto = salario_neto;
+        this.roles = roles;
     }
 
     public Usuario() {
@@ -214,5 +221,13 @@ public class Usuario {
 
     public void setHorasNocturnas(HorasNocturnas horasNocturnas) {
         this.horasNocturnas = horasNocturnas;
+    }
+
+    public Set<RolesUsuario> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RolesUsuario> roles) {
+        this.roles = roles;
     }
 }

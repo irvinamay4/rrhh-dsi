@@ -1,8 +1,6 @@
 package com.irvin.funes.rrhh.controllers;
 
-import com.irvin.funes.rrhh.models.PlanillaEmpleado;
-import com.irvin.funes.rrhh.models.RegistroHoras;
-import com.irvin.funes.rrhh.models.Usuario;
+import com.irvin.funes.rrhh.models.*;
 import com.irvin.funes.rrhh.repositories.RegistroHorasRepository;
 import com.irvin.funes.rrhh.repositories.UsuarioRepository;
 import com.irvin.funes.rrhh.services.UsuarioService;
@@ -14,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class UsuarioController {
@@ -78,6 +77,8 @@ public class UsuarioController {
                     .body(Collections.singletonMap("mensaje", "Ya existe un usuario con ese email"));
         }
 
+        Set<RolesUsuario> roles = usuario.getRoles();
+
         try {
             // Llenar automáticamente los datos de la planilla
             PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
@@ -98,6 +99,9 @@ public class UsuarioController {
 
                 usuario.setPlanillaEmpleado(planilla);
             }
+
+            // Asignar los roles al usuario
+            usuario.setRoles(roles);
 
             Usuario usuarioGuardado = service.guardar(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioGuardado);
