@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -20,6 +20,22 @@ public class RolesUsuario {
     private ERol name;
 
     public RolesUsuario(ERol name) {
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ERol getName() {
+        return name;
+    }
+
+    public void setName(ERol name) {
         this.name = name;
     }
 }

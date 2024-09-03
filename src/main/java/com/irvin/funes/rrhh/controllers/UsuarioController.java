@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,10 @@ import java.util.stream.Collectors;
 
 @RestController
 public class UsuarioController {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UsuarioService service;
 
@@ -99,6 +104,7 @@ public class UsuarioController {
 
                 usuario.setPlanillaEmpleado(planilla);
             }
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
             // Asignar los roles al usuario
             usuario.setRoles(roles);
