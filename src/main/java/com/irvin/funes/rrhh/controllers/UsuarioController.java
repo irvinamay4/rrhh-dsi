@@ -83,6 +83,7 @@ public class UsuarioController {
         }
 
         Set<RolesUsuario> roles = usuario.getRoles();
+        double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
 
         try {
             // Llenar automáticamente los datos de la planilla
@@ -99,6 +100,7 @@ public class UsuarioController {
 
                 deducciones += planilla.getIssMes();
                 deducciones += planilla.getAfpMes();
+                deducciones += dias_descontados;
                 System.out.println("Deducciones que se le restaran al salario: " + deducciones);
                 usuario.setSalario_neto(String.valueOf(salario - deducciones));
 
@@ -119,7 +121,7 @@ public class UsuarioController {
 
 
     //Solo se cambia los datos base de usuario, no se actualiza ni la planilla ni las horas
-    @PutMapping("/{id}")
+    @PutMapping("modificar/{id}")
     public ResponseEntity<?> editar(@Valid @RequestBody Usuario usuario, BindingResult result, @PathVariable Long id) {
 
         if (result.hasErrors()) {
@@ -152,6 +154,45 @@ public class UsuarioController {
             usuarioDb.setHorasDiurnas(usuario.getHorasDiurnas());
             usuarioDb.setHorasNocturnas(usuario.getHorasNocturnas());
 
+            double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
+
+            usuarioDb.setHoras(usuario.getHoras());
+            usuarioDb.setDias_descontados(usuario.getDias_descontados() );
+
+            //horas:
+            double diurnas = (((   (Double.parseDouble(usuario.getSalario())) / 30) / 8) * 2);
+
+            usuarioDb.getHorasDiurnas().setEnero(usuario.getHorasDiurnas().getEnero() * diurnas);
+            usuarioDb.getHorasDiurnas().setFebrero(usuario.getHorasDiurnas().getFebrero() * diurnas);
+            usuarioDb.getHorasDiurnas().setMarzo(usuario.getHorasDiurnas().getMarzo() * diurnas);
+            usuarioDb.getHorasDiurnas().setAbril(usuario.getHorasDiurnas().getAbril() * diurnas);
+            usuarioDb.getHorasDiurnas().setMayo(usuario.getHorasDiurnas().getMayo() * diurnas);
+            usuarioDb.getHorasDiurnas().setJunio(usuario.getHorasDiurnas().getJunio() * diurnas);
+            usuarioDb.getHorasDiurnas().setJulio(usuario.getHorasDiurnas().getJulio() * diurnas);
+            usuarioDb.getHorasDiurnas().setAgosto(usuario.getHorasDiurnas().getAgosto() * diurnas);
+            usuarioDb.getHorasDiurnas().setSeptiembre(usuario.getHorasDiurnas().getSeptiembre() * diurnas);
+            usuarioDb.getHorasDiurnas().setOctubre(usuario.getHorasDiurnas().getOctubre() * diurnas);
+            usuarioDb.getHorasDiurnas().setNoviembre(usuario.getHorasDiurnas().getNoviembre() * diurnas);
+            usuarioDb.getHorasDiurnas().setDiciembre(usuario.getHorasDiurnas().getDiciembre() * diurnas);
+
+            double nocturnas = (((   (Double.parseDouble(usuario.getSalario())) / 30) / 8) * 2.5);
+
+            // Horas nocturnas:
+            usuarioDb.getHorasNocturnas().setEnero(usuario.getHorasNocturnas().getEnero() * nocturnas);
+            usuarioDb.getHorasNocturnas().setFebrero(usuario.getHorasNocturnas().getFebrero() * nocturnas);
+            usuarioDb.getHorasNocturnas().setMarzo(usuario.getHorasNocturnas().getMarzo() * nocturnas);
+            usuarioDb.getHorasNocturnas().setAbril(usuario.getHorasNocturnas().getAbril() * nocturnas);
+            usuarioDb.getHorasNocturnas().setMayo(usuario.getHorasNocturnas().getMayo() * nocturnas);
+            usuarioDb.getHorasNocturnas().setJunio(usuario.getHorasNocturnas().getJunio() * nocturnas);
+            usuarioDb.getHorasNocturnas().setJulio(usuario.getHorasNocturnas().getJulio() * nocturnas);
+            usuarioDb.getHorasNocturnas().setAgosto(usuario.getHorasNocturnas().getAgosto() * nocturnas);
+            usuarioDb.getHorasNocturnas().setSeptiembre(usuario.getHorasNocturnas().getSeptiembre() * nocturnas);
+            usuarioDb.getHorasNocturnas().setOctubre(usuario.getHorasNocturnas().getOctubre() * nocturnas);
+            usuarioDb.getHorasNocturnas().setNoviembre(usuario.getHorasNocturnas().getNoviembre() * nocturnas);
+            usuarioDb.getHorasNocturnas().setDiciembre(usuario.getHorasNocturnas().getDiciembre() * nocturnas);
+
+
+
             // Llenar automáticamente los datos de la planilla
             PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
             if (planilla != null) {
@@ -166,6 +207,7 @@ public class UsuarioController {
 
                 deducciones += planilla.getIssMes();
                 deducciones += planilla.getAfpMes();
+                deducciones += dias_descontados;
                 usuario.setSalario_neto(String.valueOf(salario - deducciones));
                 usuarioDb.setSalario_neto(usuario.getSalario_neto());
 

@@ -60,6 +60,10 @@ public class Usuario {
     @NotBlank
     private  String salario_neto;
 
+    private  int dias_descontados;
+
+    private  int horas;
+
     @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "diurnas_id", referencedColumnName = "id") //Para que se agregue una columna usuario_id a la tabla HorasDiurnas
     private HorasDiurnas horasDiurnas;
@@ -229,5 +233,21 @@ public class Usuario {
 
     public void setRoles(Set<RolesUsuario> roles) {
         this.roles = roles;
+    }
+
+    public int getDias_descontados() {
+        return dias_descontados;
+    }
+
+    public void setDias_descontados( int dias_descontados) {
+        this.dias_descontados = dias_descontados;
+    }
+
+    public int getHoras() {
+        return horas;
+    }
+
+    public void setHoras( int horas) {
+        this.horas = horas;
     }
 }

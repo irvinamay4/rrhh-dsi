@@ -42,6 +42,10 @@ public class SecurityConfig {
                 .csrf(config -> config.disable())
                 .authorizeHttpRequests(auth ->{
                     auth.requestMatchers("/usuarios").hasAnyRole("ADMIN","RRHH");
+                    auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN","RRHH","USER");
+                    auth.requestMatchers("/crear").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/modificar/{id}").hasAnyRole("ADMIN","RRHH","USER");
+                    auth.requestMatchers("/{id}").hasAnyRole("ADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> {

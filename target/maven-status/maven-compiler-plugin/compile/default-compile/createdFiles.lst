@@ -9,8 +9,10 @@ com\irvin\funes\rrhh\exception\ResourceNotFoundException.class
 com\irvin\funes\rrhh\controllers\UsuarioController.class
 com\irvin\funes\rrhh\repositories\PlanillaEmpleadoRepository.class
 com\irvin\funes\rrhh\models\RolesUsuario.class
+com\irvin\funes\rrhh\RrhhApplication$Myconfiguration$1.class
 com\irvin\funes\rrhh\RrhhApplication.class
 com\irvin\funes\rrhh\controllers\TestRolesController.class
+com\irvin\funes\rrhh\RrhhApplication$Myconfiguration.class
 com\irvin\funes\rrhh\security\SecurityConfig.class
 com\irvin\funes\rrhh\security\filters\JwtAuthenticationFilter.class
 com\irvin\funes\rrhh\security\filters\JwtAuthorizationFilter.class
