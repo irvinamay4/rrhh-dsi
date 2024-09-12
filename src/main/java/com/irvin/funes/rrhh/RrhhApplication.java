@@ -14,21 +14,5 @@ public class RrhhApplication {
 		SpringApplication.run(RrhhApplication.class, args);
 	}
 
-	@Configuration
-	public static class Myconfiguration{
-		@Bean
-		public WebMvcConfigurer corsConfigurer(){
-			return new WebMvcConfigurer() {
-				@Override
-				public void addCorsMappings(CorsRegistry registry) {
-					registry.addMapping("/**")
-							.allowedOrigins("*")
-							.allowedHeaders("*")
-							.allowedMethods("*");
-
-				}
-			};
-		}
-	}
 
 }
