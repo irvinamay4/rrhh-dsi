@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Configuration
 public class SecurityConfig {
@@ -37,12 +38,15 @@ public class SecurityConfig {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
         jwtAuthenticationFilter.setFilterProcessesUrl("/login");
-        System.out.println("ENTROO SEGURIDAD");
 
         return  httpSecurity
                 .csrf(config -> config.disable())
                 .authorizeHttpRequests(auth ->{
-                    auth.requestMatchers("/usuarios").hasAnyRole("ADMIN","RRHH");
+                    auth.requestMatchers("/usuarios").permitAll();
+                    auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN","RRHH","USER");
+                    auth.requestMatchers("/crear").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/modificar/{id}").hasAnyRole("ADMIN","RRHH","USER");
+                    auth.requestMatchers("/{id}").hasAnyRole("ADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> {
