@@ -1,5 +1,6 @@
 package com.irvin.funes.rrhh.security;
 
+import com.irvin.funes.rrhh.repositories.UsuarioRepository;
 import com.irvin.funes.rrhh.security.filters.JwtAuthenticationFilter;
 import com.irvin.funes.rrhh.security.filters.JwtAuthorizationFilter;
 import com.irvin.funes.rrhh.security.jwt.JwtUtils;
@@ -39,10 +40,13 @@ public class SecurityConfig {
     @Autowired
     JwtAuthorizationFilter authorizationFilter;
 
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -53,7 +57,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager) throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils,usuarioRepository);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
         jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 
@@ -64,9 +68,12 @@ public class SecurityConfig {
                     auth.requestMatchers("/usuarios").permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();  // Permitir preflight CORS para todas las rutas
                     auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN", "RRHH", "USER");
-                    auth.requestMatchers("/crear").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/crear").permitAll();
                     auth.requestMatchers("/modificar/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/{id}").hasAnyRole("ADMIN");
+                    auth.requestMatchers("/sdiaslibres/consultar/usuario/{usuarioId}").permitAll();
+                    auth.requestMatchers("/sdiaslibres/crear/{id}").permitAll();
+                    auth.requestMatchers("/sdiaslibres/{id}").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

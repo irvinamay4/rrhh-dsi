@@ -5,11 +5,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "usuarios")
 public class Usuario {
     @Id
@@ -76,7 +80,14 @@ public class Usuario {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RolesUsuario> roles;
 
-    public Usuario(Long id, PlanillaEmpleado planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas, String nombre, String email, String password, String telefono, String direccion, String edad, String dui, String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto, Set<RolesUsuario> roles) {
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<SolicitudesDiasLibres> solicitudesDiasLibres;
+
+    public Usuario(Long id, PlanillaEmpleado planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas,
+                   String nombre, String email, String password, String telefono, String direccion, String edad, String dui,
+                   String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto,
+                   Set<RolesUsuario> roles, Set<SolicitudesDiasLibres> solicitudesDiasLibres) {
         this.id = id;
         this.planillaEmpleado = planillaEmpleado;
         this.horasDiurnas = horasDiurnas;
@@ -94,160 +105,11 @@ public class Usuario {
         this.salario = salario;
         this.salario_neto = salario_neto;
         this.roles = roles;
+        this.solicitudesDiasLibres = solicitudesDiasLibres;
     }
 
     public Usuario() {
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getEdad() {
-        return edad;
-    }
-
-    public void setEdad(String edad) {
-        this.edad = edad;
-    }
-
-    public String getDui() {
-        return dui;
-    }
-
-    public void setDui(String dui) {
-        this.dui = dui;
-    }
-
-    public String getCuenta_planillera() {
-        return cuenta_planillera;
-    }
-
-    public void setCuenta_planillera(String cuenta_planillera) {
-        this.cuenta_planillera = cuenta_planillera;
-    }
-
-    public String getCargo() {
-        return cargo;
-    }
-
-    public void setCargo(String cargo) {
-        this.cargo = cargo;
-    }
-
-    public String getFecha_ingreso() {
-        return fecha_ingreso;
-    }
-
-    public void setFecha_ingreso(String fecha_ingreso) {
-        this.fecha_ingreso = fecha_ingreso;
-    }
-
-    public String getSalario() {
-        return salario;
-    }
-
-    public void setSalario(String salario) {
-        this.salario = salario;
-    }
-
-    public String getSalario_neto() {
-        return salario_neto;
-    }
-
-    public void setSalario_neto(String salario_neto) {
-        this.salario_neto = salario_neto;
-    }
-
-    public PlanillaEmpleado getPlanillaEmpleado() {
-        return planillaEmpleado;
-    }
-
-    public void setPlanillaEmpleado(PlanillaEmpleado planillaEmpleado) {
-        this.planillaEmpleado = planillaEmpleado;
-    }
-
-    public HorasDiurnas getHorasDiurnas() {
-        return horasDiurnas;
-    }
-
-    public void setHorasDiurnas(HorasDiurnas horasDiurnas) {
-        this.horasDiurnas = horasDiurnas;
-    }
-
-    public HorasNocturnas getHorasNocturnas() {
-        return horasNocturnas;
-    }
-
-    public void setHorasNocturnas(HorasNocturnas horasNocturnas) {
-        this.horasNocturnas = horasNocturnas;
-    }
-
-    public Set<RolesUsuario> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<RolesUsuario> roles) {
-        this.roles = roles;
-    }
-
-    public int getDias_descontados() {
-        return dias_descontados;
-    }
-
-    public void setDias_descontados( int dias_descontados) {
-        this.dias_descontados = dias_descontados;
-    }
-
-    public int getHoras() {
-        return horas;
-    }
-
-    public void setHoras( int horas) {
-        this.horas = horas;
-    }
 }

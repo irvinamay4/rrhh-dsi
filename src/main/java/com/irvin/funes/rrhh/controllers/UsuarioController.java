@@ -1,7 +1,7 @@
 package com.irvin.funes.rrhh.controllers;
 
 import com.irvin.funes.rrhh.models.*;
-import com.irvin.funes.rrhh.repositories.RegistroHorasRepository;
+import com.irvin.funes.rrhh.repositories.SolicitudesDiasLibresRepository;
 import com.irvin.funes.rrhh.repositories.UsuarioRepository;
 import com.irvin.funes.rrhh.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -13,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class UsuarioController {
@@ -28,7 +27,8 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private RegistroHorasRepository registroHorasRepository;
+    private SolicitudesDiasLibresRepository solicitudesDiasLibresRepository;
+
 
     @GetMapping
     public List<Usuario> listar(){
@@ -221,8 +221,6 @@ public class UsuarioController {
 
 
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id){
         Optional<Usuario> o = service.porId(id);
@@ -233,23 +231,55 @@ public class UsuarioController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/sdiaslibres/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarSolicitudesPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<SolicitudesDiasLibres> solicitudes = solicitudesDiasLibresRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!solicitudes.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(solicitudes);
+        }
+        return ResponseEntity.notFound().build();
+    }
 
-    @PostMapping("/horas")
-    public ResponseEntity<?> tiempo( @RequestBody RegistroHoras registroHoras, BindingResult result){
-
-        if (result.hasErrors()){
+    @PostMapping("/sdiaslibres/crear/{id}")
+    public ResponseEntity<?> crearSolicitud(@Valid @RequestBody SolicitudesDiasLibres solicitud, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
             return validar(result);
         }
 
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(registroHorasRepository.save(registroHoras));
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<SolicitudesDiasLibres> solicitudes = usuario.getSolicitudesDiasLibres(); //trae la coleccion de solicitudes del user
+            solicitud.setUsuario(usuario); //setea el usuario en la solicitud
+            solicitudes.add(solicitud); //adiciona una nueva solicitud
+            usuario.setSolicitudesDiasLibres(solicitudes);//setea la coleccion ya con la nueva agregada
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
     }
-    @GetMapping("/horas")
-    public ResponseEntity<List<RegistroHoras>> obtenerTodasLasHoras() {
-        List<RegistroHoras> horas = (List<RegistroHoras>) registroHorasRepository.findAll();
-        return new ResponseEntity<>(horas, HttpStatus.OK);
-    }
 
+    @PutMapping("/sdiaslibres/{id}")
+    public ResponseEntity<?> editarSolicitud(@Valid @RequestBody SolicitudesDiasLibres solicitud, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<SolicitudesDiasLibres> o = solicitudesDiasLibresRepository.findById(id);
+        if (o.isPresent()) {
+            SolicitudesDiasLibres solicitudDb = o.get();
+            solicitudDb.setFecha_solicitud(solicitud.getFecha_solicitud());
+            solicitudDb.setFecha_inicio(solicitud.getFecha_inicio());
+            solicitudDb.setFecha_fin(solicitud.getFecha_fin());
+            solicitudDb.setCausa(solicitud.getCausa());
+            solicitudDb.setCantidad_dias(solicitud.getCantidad_dias());
+            solicitudDb.setMes(solicitud.getMes());
+            solicitudDb.setAño(solicitud.getAño());
+            return ResponseEntity.status(HttpStatus.CREATED).body(solicitudesDiasLibresRepository.save(solicitudDb));
+        }
+        return ResponseEntity.notFound().build();
+    }
 
     private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
         Map<String,String> errores = new HashMap<>();
