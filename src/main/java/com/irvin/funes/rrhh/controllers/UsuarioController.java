@@ -261,25 +261,26 @@ public class UsuarioController {
     }
 
     @PutMapping("/sdiaslibres/{id}")
-    public ResponseEntity<?> editarSolicitud(@Valid @RequestBody SolicitudesDiasLibres solicitud, BindingResult result, @PathVariable Long id) {
-        if (result.hasErrors()) {
-            return validar(result);
-        }
-
+    public ResponseEntity<?> actualizarEstadoSolicitud(@RequestBody Map<String, String> estadoUpdate, @PathVariable Long id) {
         Optional<SolicitudesDiasLibres> o = solicitudesDiasLibresRepository.findById(id);
+
         if (o.isPresent()) {
             SolicitudesDiasLibres solicitudDb = o.get();
-            solicitudDb.setFecha_solicitud(solicitud.getFecha_solicitud());
-            solicitudDb.setFecha_inicio(solicitud.getFecha_inicio());
-            solicitudDb.setFecha_fin(solicitud.getFecha_fin());
-            solicitudDb.setCausa(solicitud.getCausa());
-            solicitudDb.setCantidad_dias(solicitud.getCantidad_dias());
-            solicitudDb.setMes(solicitud.getMes());
-            solicitudDb.setAño(solicitud.getAño());
-            return ResponseEntity.status(HttpStatus.CREATED).body(solicitudesDiasLibresRepository.save(solicitudDb));
+
+            // Extraemos el valor de "estado" del JSON
+            String nuevoEstado = estadoUpdate.get("estado");
+            if (nuevoEstado != null) {
+                solicitudDb.setEstado(nuevoEstado);  // Actualizamos solo el campo "estado"
+                solicitudesDiasLibresRepository.save(solicitudDb);
+                return ResponseEntity.ok(solicitudDb);  // Devolvemos la solicitud actualizada
+            } else {
+                return ResponseEntity.badRequest().body("El campo 'estado' es requerido");
+            }
         }
+
         return ResponseEntity.notFound().build();
     }
+
 
     private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
         Map<String,String> errores = new HashMap<>();
