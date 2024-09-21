@@ -57,7 +57,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager) throws Exception {
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils,usuarioRepository);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtils, usuarioRepository);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
         jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 
@@ -65,22 +65,28 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita CORS aquí
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF si estás trabajando con JWT
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/usuarios").permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();  // Permitir preflight CORS para todas las rutas
+                    auth.requestMatchers("/solicitudes").hasAnyRole("ADMIN", "RRHH");
+                    // Otras rutas con restricciones
+                    auth.requestMatchers("/usuarios").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN", "RRHH", "USER");
-                    auth.requestMatchers("/crear").permitAll();
+                    auth.requestMatchers("/crear").hasAnyRole("ADMIN");
                     auth.requestMatchers("/modificar/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/{id}").hasAnyRole("ADMIN");
-                    auth.requestMatchers("/sdiaslibres/consultar/usuario/{usuarioId}").permitAll();
-                    auth.requestMatchers("/sdiaslibres/crear/{id}").permitAll();
-                    auth.requestMatchers("/sdiaslibres/{id}").permitAll();
+                    auth.requestMatchers("/sdiaslibres/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/sdiaslibres/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/sdiaslibres/{id}").hasAnyRole("RRHH");
+
+
+                    // Cualquier otra petición debe estar autenticada
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilter(jwtAuthenticationFilter)
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-    };
+    }
+
 
 /*
     @Bean

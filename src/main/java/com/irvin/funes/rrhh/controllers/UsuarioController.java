@@ -1,5 +1,6 @@
 package com.irvin.funes.rrhh.controllers;
 
+import com.irvin.funes.rrhh.dtos.SolicitudesDiasLibresDto;
 import com.irvin.funes.rrhh.models.*;
 import com.irvin.funes.rrhh.repositories.SolicitudesDiasLibresRepository;
 import com.irvin.funes.rrhh.repositories.UsuarioRepository;
@@ -48,6 +49,7 @@ public class UsuarioController {
         return new ResponseEntity<>(usuarios, HttpStatus.OK);
     }
 
+
     @GetMapping("/usuarios{id}")
     public ResponseEntity<?> detalle(@PathVariable Long id){
         Optional<Usuario> usuarioOptional = service.porId(id);//atajo ctrl alt v
@@ -58,17 +60,6 @@ public class UsuarioController {
         return ResponseEntity.notFound().build();
     }
 
-    /*@PostMapping("/crear")
-    public Usuario crear( @RequestBody Usuario usuario){
-
-        PlanillaEmpleado planillaEmpleado = usuario.getPlanillaEmpleado();
-        System.out.println("**********************************************");
-        System.out.println(planillaEmpleado);
-
-
-        Usuario user = usuarioRepository.save(usuario);
-        return user;
-    }*/
 
     @PostMapping("/crear")
     public ResponseEntity<?> crear(@Valid @RequestBody Usuario usuario, BindingResult result) {
@@ -279,6 +270,37 @@ public class UsuarioController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/solicitudes")
+    public ResponseEntity<List<SolicitudesDiasLibresDto>> listaSolicitudes() {
+        List<SolicitudesDiasLibres> solicitudesDiasLibres = new ArrayList<>();
+        solicitudesDiasLibresRepository.findAll().forEach(solicitudesDiasLibres::add);
+
+        if (solicitudesDiasLibres.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<SolicitudesDiasLibresDto> solicitudesDTO = new ArrayList<>();
+        for (SolicitudesDiasLibres solicitud : solicitudesDiasLibres) {
+            SolicitudesDiasLibresDto dto = new SolicitudesDiasLibresDto(
+                    solicitud.getId(),
+                    solicitud.getFecha_solicitud(),
+                    solicitud.getFecha_inicio(),
+                    solicitud.getFecha_fin(),
+                    solicitud.getCantidad_dias(),
+                    solicitud.getMes(),
+                    solicitud.getAño(),
+                    solicitud.getCausa(),
+                    solicitud.getEstado(),
+                    solicitud.getUsuario() != null ? solicitud.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
     }
 
 
