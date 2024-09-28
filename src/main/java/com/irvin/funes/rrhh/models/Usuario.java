@@ -22,9 +22,9 @@ public class Usuario {
 
     //@OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     //@OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
-    @JoinColumn(name = "planilla_id", referencedColumnName = "id") //Para que se agregue una columna usuario_id a la tabla PlanillaEmpleado
-    private PlanillaEmpleado planillaEmpleado;
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<PlanillaEmpleado> planillaEmpleado;
 
     @NotEmpty(message = "El campo nombre no puede ser vacio")
     private String nombre;
@@ -64,9 +64,9 @@ public class Usuario {
     @NotBlank
     private  String salario_neto;
 
-    private  int dias_descontados;
+    private String estado;
 
-    private  int horas;
+    private String sexo;
 
     @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "diurnas_id", referencedColumnName = "id") //Para que se agregue una columna usuario_id a la tabla HorasDiurnas
@@ -84,9 +84,33 @@ public class Usuario {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Set<SolicitudesDiasLibres> solicitudesDiasLibres;
 
-    public Usuario(Long id, PlanillaEmpleado planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas,
+    //todo: tablas de deducciones varias
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<IncapacidadDiasUsuario> incapacidadDiasUsuarios;
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<AsuetoTrabajadoDiasUsuario> asuetoTrabajadoDiasUsuarios;
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios;
+
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<AusenciaDiaUsuario> ausenciaDiaUsuarios;
+
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<VacacionesDiasUsuario> vacacionesDiasUsuarios;
+
+
+
+    public Usuario(Long id, Set<PlanillaEmpleado> planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas,
                    String nombre, String email, String password, String telefono, String direccion, String edad, String dui,
-                   String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto,
+                   String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto, String estado, String sexo,
                    Set<RolesUsuario> roles, Set<SolicitudesDiasLibres> solicitudesDiasLibres) {
         this.id = id;
         this.planillaEmpleado = planillaEmpleado;
@@ -104,6 +128,8 @@ public class Usuario {
         this.fecha_ingreso = fecha_ingreso;
         this.salario = salario;
         this.salario_neto = salario_neto;
+        this.estado = estado;
+        this.sexo = sexo;
         this.roles = roles;
         this.solicitudesDiasLibres = solicitudesDiasLibres;
     }

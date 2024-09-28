@@ -1,7 +1,16 @@
 package com.irvin.funes.rrhh.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "empleado_planilla")
 public class PlanillaEmpleado {
@@ -9,89 +18,35 @@ public class PlanillaEmpleado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private  double issMes;
-    private  double afpMes;
-    private  double aguinaldo;
     private  double horasEDiurnas;
     private  double horasENocturnas;
+    private String nombreEmpleado;
+    private String cargoEmpleado;
+    private String duiEmpleado;
+    private String fechaInicio;
+    private String fechaFin;
+    private double salarioBase;
+    private double salarioDia;
+    private int diasLaborados;
+    private int diasAusentes;
+    private int incapacidades;
+    private double vacaciones;
+    private double asuetos;
+    private double totalDevengado;
+    private double descuetoAfp;
+    private double descuentoIsss;
+    private double descuentoRenta;
+    private double totalDescuentos;
+    private double liquidoPagar;
+    private String mes;
 
-    public PlanillaEmpleado(Long id, double issMes, double afpMes, double aguinaldo, double horasEDiurnas, double horasENocturnas) {
-        this.id = id;
-        this.issMes = issMes;
-        this.afpMes = afpMes;
-        this.aguinaldo = aguinaldo;
-        this.horasEDiurnas = horasEDiurnas;
-        this.horasENocturnas = horasENocturnas;
-    }
+    //agregar horas y dias descontados...
 
-    public PlanillaEmpleado() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnore // Esto evitará que el usuario completo aparezca en el JSON
+    private Usuario usuario;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-   /* public Long getUsuarioId() {
-        return usuarioId;
-    }
-
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
-    }*/
-
-    public double getIssMes() {
-        return issMes;
-    }
-
-    public void setIssMes(double issMes) {
-        this.issMes = issMes;
-    }
-
-    public double getAfpMes() {
-        return afpMes;
-    }
-
-    public void setAfpMes(double afpMes) {
-        this.afpMes = afpMes;
-    }
-
-    public double getAguinaldo() {
-        return aguinaldo;
-    }
-
-    public void setAguinaldo(double aguinaldo) {
-        this.aguinaldo = aguinaldo;
-    }
-
-    public double getHorasEDiurnas() {
-        return horasEDiurnas;
-    }
-
-    public void setHorasEDiurnas(double horasEDiurnas) {
-        this.horasEDiurnas = horasEDiurnas;
-    }
-
-    public double getHorasENocturnas() {
-        return horasENocturnas;
-    }
-
-    public void setHorasENocturnas(double horasENocturnas) {
-        this.horasENocturnas = horasENocturnas;
-    }
-
-    @Override
-    public String toString() {
-        return "PlanillaEmpleado{" +
-                "ISS_MES=" + issMes +
-                ", AFP_MES=" + afpMes +
-                ", AGUINALDO=" + aguinaldo +
-                ", HORAS_E_DIURNAS=" + horasEDiurnas +
-                ", HORAS_E_NOCTURNAS=" + horasENocturnas +
-                '}';
-    }
 }
 

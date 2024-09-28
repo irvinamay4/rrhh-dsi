@@ -74,11 +74,11 @@ public class UsuarioController {
         }
 
         Set<RolesUsuario> roles = usuario.getRoles();
-        double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
+        //double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
 
         try {
             // Llenar automáticamente los datos de la planilla
-            PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
+            /*PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
             if (planilla != null) {
                 double deducciones = 0;
                 double salario = Double.parseDouble(usuario.getSalario());
@@ -96,11 +96,13 @@ public class UsuarioController {
                 usuario.setSalario_neto(String.valueOf(salario - deducciones));
 
                 usuario.setPlanillaEmpleado(planilla);
-            }
+            }*/
             usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
             // Asignar los roles al usuario
             usuario.setRoles(roles);
+
+            usuario.setEstado("Activo");
 
             Usuario usuarioGuardado = service.guardar(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioGuardado);
@@ -145,10 +147,10 @@ public class UsuarioController {
             usuarioDb.setHorasDiurnas(usuario.getHorasDiurnas());
             usuarioDb.setHorasNocturnas(usuario.getHorasNocturnas());
 
-            double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
+            //double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
 
-            usuarioDb.setHoras(usuario.getHoras());
-            usuarioDb.setDias_descontados(usuario.getDias_descontados() );
+            //usuarioDb.setHoras(usuario.getHoras());
+            //usuarioDb.setDias_descontados(usuario.getDias_descontados() );
 
             //horas:
             double diurnas = (((   (Double.parseDouble(usuario.getSalario())) / 30) / 8) * 2);
@@ -185,7 +187,7 @@ public class UsuarioController {
 
 
             // Llenar automáticamente los datos de la planilla
-            PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
+            /*PlanillaEmpleado planilla = usuario.getPlanillaEmpleado();
             if (planilla != null) {
                 double deducciones = 0;
                 double salario = Double.parseDouble(usuario.getSalario());
@@ -203,7 +205,7 @@ public class UsuarioController {
                 usuarioDb.setSalario_neto(usuario.getSalario_neto());
 
                 usuarioDb.setPlanillaEmpleado(planilla);
-            }
+            }*/
 
             return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuarioDb));
         }

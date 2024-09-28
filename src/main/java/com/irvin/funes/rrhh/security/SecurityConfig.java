@@ -66,6 +66,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Desactiva CSRF si estás trabajando con JWT
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();  // Permitir preflight CORS para todas las rutas
+                    auth.requestMatchers("/planilla/crear/{id}").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/planillas").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/solicitudes").hasAnyRole("ADMIN", "RRHH");
                     // Otras rutas con restricciones
                     auth.requestMatchers("/usuarios").hasAnyRole("ADMIN", "RRHH");
