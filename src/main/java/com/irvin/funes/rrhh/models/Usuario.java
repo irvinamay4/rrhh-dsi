@@ -89,14 +89,25 @@ public class Usuario {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Set<IncapacidadDiasUsuario> incapacidadDiasUsuarios;
 
+    //YA MAPEADA
     @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Set<AsuetoTrabajadoDiasUsuario> asuetoTrabajadoDiasUsuarios;
 
+    //YA MAPEADA
     @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     private Set<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios;
 
+    //YA MAPEADA
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<ExtrasDiurnas> extrasDiurnas;
+
+    //YA MAPEADA
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Set<ExtrasNocturnas> extrasNocturnas;
 
     @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
@@ -111,7 +122,8 @@ public class Usuario {
     public Usuario(Long id, Set<PlanillaEmpleado> planillaEmpleado, HorasDiurnas horasDiurnas, HorasNocturnas horasNocturnas,
                    String nombre, String email, String password, String telefono, String direccion, String edad, String dui,
                    String cuenta_planillera, String cargo, String fecha_ingreso, String salario, String salario_neto, String estado, String sexo,
-                   Set<RolesUsuario> roles, Set<SolicitudesDiasLibres> solicitudesDiasLibres) {
+                   Set<RolesUsuario> roles, Set<SolicitudesDiasLibres> solicitudesDiasLibres, Set<AsuetoTrabajadoDiasUsuario> asuetoTrabajadoDiasUsuarios,
+                   Set<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios, Set<ExtrasDiurnas> extrasDiurnas, Set<ExtrasNocturnas> extrasNocturnas) {
         this.id = id;
         this.planillaEmpleado = planillaEmpleado;
         this.horasDiurnas = horasDiurnas;
@@ -132,6 +144,10 @@ public class Usuario {
         this.sexo = sexo;
         this.roles = roles;
         this.solicitudesDiasLibres = solicitudesDiasLibres;
+        this.asuetoTrabajadoDiasUsuarios = asuetoTrabajadoDiasUsuarios;
+        this.cargaLaboralDiurnaUsuarios = cargaLaboralDiurnaUsuarios;
+        this.extrasDiurnas = extrasDiurnas;
+        this.extrasNocturnas = extrasNocturnas;
     }
 
     public Usuario() {

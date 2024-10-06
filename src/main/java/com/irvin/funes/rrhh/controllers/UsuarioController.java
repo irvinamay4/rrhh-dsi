@@ -1,9 +1,8 @@
 package com.irvin.funes.rrhh.controllers;
 
-import com.irvin.funes.rrhh.dtos.SolicitudesDiasLibresDto;
+import com.irvin.funes.rrhh.dtos.*;
 import com.irvin.funes.rrhh.models.*;
-import com.irvin.funes.rrhh.repositories.SolicitudesDiasLibresRepository;
-import com.irvin.funes.rrhh.repositories.UsuarioRepository;
+import com.irvin.funes.rrhh.repositories.*;
 import com.irvin.funes.rrhh.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,21 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    //REPOSITORIOS DE TABLAS DE HORAS Y DIAS
     @Autowired
     private SolicitudesDiasLibresRepository solicitudesDiasLibresRepository;
+
+    @Autowired
+    private AsuetosTrabajadosRepository asuetosTrabajadosRepository;
+
+    @Autowired
+    private CargaLaboralDiurnaRepository cargaLaboralDiurnaRepository;
+
+    @Autowired
+    private ExtrasDiurnasRepository extrasDiurnasRepository;
+
+    @Autowired
+    private ExtrasNocturnasRepository extrasNocturnasRepository;
 
 
     @GetMapping
@@ -224,6 +236,7 @@ public class UsuarioController {
         return ResponseEntity.notFound().build();
     }
 
+    //SOLICITUDES DE DIAS LIBRES
     @GetMapping("/sdiaslibres/consultar/usuario/{usuarioId}")
     public ResponseEntity<?> listarSolicitudesPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
         List<SolicitudesDiasLibres> solicitudes = solicitudesDiasLibresRepository.findByUsuarioId(usuarioId);
@@ -304,6 +317,292 @@ public class UsuarioController {
 
         return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
     }
+
+
+
+    //ASUETOS TRABAJADOS ************************************************************************************************
+    @GetMapping("/asuetos-trabajados/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarAsuetosTrabajadosPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<AsuetoTrabajadoDiasUsuario> asuetosTrabajado = asuetosTrabajadosRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!asuetosTrabajado.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(asuetosTrabajado);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/asuetos-trabajados/crear/{id}")
+    public ResponseEntity<?> crearAsuetoTrabajado(@Valid @RequestBody AsuetoTrabajadoDiasUsuario asuetoTrabajado, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<AsuetoTrabajadoDiasUsuario> asuetosTrabajado = usuario.getAsuetoTrabajadoDiasUsuarios();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<AsuetoTrabajadoDiasUsuario> existingAsueto = asuetosTrabajado.stream()
+                    .filter(a -> a.getMes().equals(asuetoTrabajado.getMes()) && a.getAño().equals(asuetoTrabajado.getAño()))
+                    .findFirst();
+
+            if (existingAsueto.isPresent()) {
+                // Acumular horas si ya existe
+                AsuetoTrabajadoDiasUsuario asuetoExistente = existingAsueto.get();
+                asuetoExistente.setCantidad_horas(asuetoExistente.getCantidad_horas() + asuetoTrabajado.getCantidad_horas());
+            } else {
+                // Crear nuevo registro si no existe
+                asuetoTrabajado.setUsuario(usuario);
+                asuetosTrabajado.add(asuetoTrabajado);
+            }
+
+            usuario.setAsuetoTrabajadoDiasUsuarios(asuetosTrabajado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/asuetos-trabajados")
+    public ResponseEntity<List<AsuetosTrabajadosDto>> listaAsuetosTrabajados() {
+        List<AsuetoTrabajadoDiasUsuario> asuetosTrabajados = new ArrayList<>();
+        asuetosTrabajadosRepository.findAll().forEach(asuetosTrabajados::add);
+
+        if (asuetosTrabajados.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<AsuetosTrabajadosDto> solicitudesDTO = new ArrayList<>();
+        for (AsuetoTrabajadoDiasUsuario solicitud : asuetosTrabajados) {
+            AsuetosTrabajadosDto dto = new AsuetosTrabajadosDto(
+                    solicitud.getId(),
+                    solicitud.getCantidad_horas(),
+                    solicitud.getMes(),
+                    solicitud.getAño(),
+                    solicitud.getUsuario() != null ? solicitud.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+
+    //CARGA LABORAL DIURNA ************************************************************************************************
+    @GetMapping("/carga-laboral-diurna/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarCargaLaboralDiurnaPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios = cargaLaboralDiurnaRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!cargaLaboralDiurnaUsuarios.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(cargaLaboralDiurnaUsuarios);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/carga-laboral-diurna/crear/{id}")
+    public ResponseEntity<?> crearCargaLaboralDiurna(@Valid @RequestBody CargaLaboralDiurnaUsuario cargaLaboral, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios = usuario.getCargaLaboralDiurnaUsuarios();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<CargaLaboralDiurnaUsuario> existingAsueto = cargaLaboralDiurnaUsuarios.stream()
+                    .filter(a -> a.getMes().equals(cargaLaboral.getMes()) && a.getAño().equals(cargaLaboral.getAño()))
+                    .findFirst();
+
+            if (existingAsueto.isPresent()) {
+                // Acumular horas si ya existe
+                CargaLaboralDiurnaUsuario asuetoExistente = existingAsueto.get();
+                asuetoExistente.setCantidad_horas(asuetoExistente.getCantidad_horas() + cargaLaboral.getCantidad_horas());
+            } else {
+                // Crear nuevo registro si no existe
+                cargaLaboral.setUsuario(usuario);
+                cargaLaboralDiurnaUsuarios.add(cargaLaboral);
+            }
+
+            usuario.setCargaLaboralDiurnaUsuarios(cargaLaboralDiurnaUsuarios);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/carga-laboral-diurna")
+    public ResponseEntity<List<CargaLaboralDiurnaDto>> listaCargaLaboralDiurna() {
+        List<CargaLaboralDiurnaUsuario> cargaLaboralDiurnaUsuarios = new ArrayList<>();
+        cargaLaboralDiurnaRepository.findAll().forEach(cargaLaboralDiurnaUsuarios::add);
+
+        if (cargaLaboralDiurnaUsuarios.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<CargaLaboralDiurnaDto> solicitudesDTO = new ArrayList<>();
+        for (CargaLaboralDiurnaUsuario solicitud : cargaLaboralDiurnaUsuarios) {
+            CargaLaboralDiurnaDto dto = new CargaLaboralDiurnaDto(
+                    solicitud.getId(),
+                    solicitud.getCantidad_horas(),
+                    solicitud.getMes(),
+                    solicitud.getAño(),
+                    solicitud.getUsuario() != null ? solicitud.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+
+    //EXTRAS DIURNAS ************************************************************************************************
+    @GetMapping("/extras-diurnas/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarExtrasDiurnasPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<ExtrasDiurnas> extrasDiurnas = extrasDiurnasRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!extrasDiurnas.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(extrasDiurnas);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/extras-diurnas/crear/{id}")
+    public ResponseEntity<?> crearExtrasDiurnas(@Valid @RequestBody ExtrasDiurnas extrasDiurnas, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<ExtrasDiurnas> extrasDiurnasSet = usuario.getExtrasDiurnas();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<ExtrasDiurnas> existingHoras = extrasDiurnasSet.stream()
+                    .filter(a -> a.getMes().equals(extrasDiurnas.getMes()) && a.getAño().equals(extrasDiurnas.getAño()))
+                    .findFirst();
+
+            if (existingHoras.isPresent()) {
+                // Acumular horas si ya existe
+                ExtrasDiurnas extrasDiurnasAcumuado = existingHoras.get();
+                extrasDiurnasAcumuado.setCantidad_horas(extrasDiurnasAcumuado.getCantidad_horas() + extrasDiurnas.getCantidad_horas());
+            } else {
+                // Crear nuevo registro si no existe
+                extrasDiurnas.setUsuario(usuario);
+                extrasDiurnasSet.add(extrasDiurnas);
+            }
+
+            usuario.setExtrasDiurnas(extrasDiurnasSet);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/extras-diurnas")
+    public ResponseEntity<List<ExtrasDiurnasDto>> listaExtrasDiurnas() {
+        List<ExtrasDiurnas> extrasDiurnas = new ArrayList<>();
+        extrasDiurnasRepository.findAll().forEach(extrasDiurnas::add);
+
+        if (extrasDiurnas.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<ExtrasDiurnasDto> solicitudesDTO = new ArrayList<>();
+        for (ExtrasDiurnas horas : extrasDiurnas) {
+            ExtrasDiurnasDto dto = new ExtrasDiurnasDto(
+                    horas.getId(),
+                    horas.getCantidad_horas(),
+                    horas.getMes(),
+                    horas.getAño(),
+                    horas.getUsuario() != null ? horas.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+
+    //EXTRAS NOCTURNAS ************************************************************************************************
+    @GetMapping("/extras-nocturnas/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarExtrasnNocturnasPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<ExtrasNocturnas> extrasNocturnas = extrasNocturnasRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!extrasNocturnas.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(extrasNocturnas);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/extras-nocturnas/crear/{id}")
+    public ResponseEntity<?> crearExtrasNocturnas(@Valid @RequestBody ExtrasNocturnas extrasNocturnas, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<ExtrasNocturnas> extrasNocturnasSet = usuario.getExtrasNocturnas();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<ExtrasNocturnas> existingHoras = extrasNocturnasSet.stream()
+                    .filter(a -> a.getMes().equals(extrasNocturnas.getMes()) && a.getAño().equals(extrasNocturnas.getAño()))
+                    .findFirst();
+
+            if (existingHoras.isPresent()) {
+                // Acumular horas si ya existe
+                ExtrasNocturnas extrasNocturnasAcumulado = existingHoras.get();
+                extrasNocturnasAcumulado.setCantidad_horas(extrasNocturnasAcumulado.getCantidad_horas() + extrasNocturnas.getCantidad_horas());
+            } else {
+                // Crear nuevo registro si no existe
+                extrasNocturnas.setUsuario(usuario);
+                extrasNocturnasSet.add(extrasNocturnas);
+            }
+
+            usuario.setExtrasNocturnas(extrasNocturnasSet);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/extras-nocturnas")
+    public ResponseEntity<List<ExtrasNocturnasDto>> listaExtrasNocturnas() {
+        List<ExtrasNocturnas> extrasNocturnas = new ArrayList<>();
+        extrasNocturnasRepository.findAll().forEach(extrasNocturnas::add);
+
+        if (extrasNocturnas.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<ExtrasNocturnasDto> solicitudesDTO = new ArrayList<>();
+        for (ExtrasNocturnas horas : extrasNocturnas) {
+            ExtrasNocturnasDto dto = new ExtrasNocturnasDto(
+                    horas.getId(),
+                    horas.getCantidad_horas(),
+                    horas.getMes(),
+                    horas.getAño(),
+                    horas.getUsuario() != null ? horas.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
 
 
     private static ResponseEntity<Map<String, String>> validar(BindingResult result) {

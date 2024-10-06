@@ -69,6 +69,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/planilla/crear/{id}").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/planillas").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/solicitudes").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/asuetos-trabajados").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/carga-laboral-diurna").hasAnyRole("ADMIN", "RRHH");
                     // Otras rutas con restricciones
                     auth.requestMatchers("/usuarios").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN", "RRHH", "USER");
@@ -77,7 +79,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/{id}").hasAnyRole("ADMIN");
                     auth.requestMatchers("/sdiaslibres/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/sdiaslibres/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
-                    auth.requestMatchers("/sdiaslibres/{id}").hasAnyRole("RRHH");
+                    auth.requestMatchers("/asuetos-trabajados/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/asuetos-trabajados/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/carga-laboral-diurna/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/carga-laboral-diurna/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
 
 
                     // Cualquier otra petición debe estar autenticada
