@@ -42,6 +42,12 @@ public class UsuarioController {
     @Autowired
     private ExtrasNocturnasRepository extrasNocturnasRepository;
 
+    @Autowired
+    private IncapacidadDiasUsuarioRepository incapacidadDiasUsuarioRepository;
+
+    @Autowired
+    private VacacionesDiasUsuariosRepository vacacionesDiasUsuariosRepository;
+
 
     @GetMapping
     public List<Usuario> listar(){
@@ -596,6 +602,139 @@ public class UsuarioController {
                     horas.getMes(),
                     horas.getAño(),
                     horas.getUsuario() != null ? horas.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+
+    //Incapacidad Dias Usuario ************************************************************************************************
+    @GetMapping("/incapadidad-dias-usuario/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarIncapacidadDiasPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<IncapacidadDiasUsuario> incapacidadDiasUsuarios = incapacidadDiasUsuarioRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!incapacidadDiasUsuarios.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(incapacidadDiasUsuarios);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/incapadidad-dias-usuario/crear/{id}")
+    public ResponseEntity<?> crearIncapacidadDias(@Valid @RequestBody IncapacidadDiasUsuario incapacidadDiasUsuario, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<IncapacidadDiasUsuario> incapacidadDiasUsuarioSet = usuario.getIncapacidadDiasUsuarios();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<IncapacidadDiasUsuario> existingDias = incapacidadDiasUsuarioSet.stream()
+                    .filter(a -> a.getMes().equals(incapacidadDiasUsuario.getMes()) && a.getAño().equals(incapacidadDiasUsuario.getAño()))
+                    .findFirst();
+
+            if (existingDias.isPresent()) {
+                // Acumular dias si ya existe
+                IncapacidadDiasUsuario incapacidadDiasAcumulado = existingDias.get();
+                incapacidadDiasAcumulado.setCantidad_dias(incapacidadDiasAcumulado.getCantidad_dias() + incapacidadDiasUsuario.getCantidad_dias());
+            } else {
+                // Crear nuevo registro si no existe
+                incapacidadDiasUsuario.setUsuario(usuario);
+                incapacidadDiasUsuarioSet.add(incapacidadDiasUsuario);
+            }
+
+            usuario.setIncapacidadDiasUsuarios(incapacidadDiasUsuarioSet);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/incapadidad-dias-usuario")
+    public ResponseEntity<List<IncapacidadDiasUsuarioDto>> listaIncapacidadDias() {
+        List<IncapacidadDiasUsuario> extrasNocturnas = new ArrayList<>();
+        incapacidadDiasUsuarioRepository.findAll().forEach(extrasNocturnas::add);
+
+        if (extrasNocturnas.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<IncapacidadDiasUsuarioDto> solicitudesDTO = new ArrayList<>();
+        for (IncapacidadDiasUsuario dias : extrasNocturnas) {
+            IncapacidadDiasUsuarioDto dto = new IncapacidadDiasUsuarioDto(
+                    dias.getId(),
+                    dias.getCantidad_dias(),
+                    dias.getMes(),
+                    dias.getAño(),
+                    dias.getUsuario() != null ? dias.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+
+    //Vacaciones Dias Usuario ************************************************************************************************
+    @GetMapping("/vacaciones-dias-usuario/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarVacacionesDiasPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<VacacionesDiasUsuario> vacacionesDiasUsuarios = vacacionesDiasUsuariosRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!vacacionesDiasUsuarios.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(vacacionesDiasUsuarios);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/vacaciones-dias-usuario/crear/{id}")
+    public ResponseEntity<?> crearVacacionesDias(@Valid @RequestBody VacacionesDiasUsuario vacacionesDiasUsuario, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<VacacionesDiasUsuario> vacacionesDiasUsuarioSet = usuario.getVacacionesDiasUsuarios();
+
+            // Crear nuevo registro si no existe
+            vacacionesDiasUsuario.setUsuario(usuario);
+            vacacionesDiasUsuarioSet.add(vacacionesDiasUsuario);
+
+            usuario.setVacacionesDiasUsuarios(vacacionesDiasUsuarioSet);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/vacaciones-dias-usuario")
+    public ResponseEntity<List<VacacionesDiasUsuarioDto>> listaVacacionesDias() {
+        List<VacacionesDiasUsuario> vacacionesDiasUsuarios = new ArrayList<>();
+        vacacionesDiasUsuariosRepository.findAll().forEach(vacacionesDiasUsuarios::add);
+
+        if (vacacionesDiasUsuarios.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<VacacionesDiasUsuarioDto> solicitudesDTO = new ArrayList<>();
+        for (VacacionesDiasUsuario dias : vacacionesDiasUsuarios) {
+            VacacionesDiasUsuarioDto dto = new VacacionesDiasUsuarioDto(
+                    dias.getId(),
+                    dias.getFecha_inicio(),
+                    dias.getFecha_fin(),
+                    dias.getCantidad_dias(),
+                    dias.getMes(),
+                    dias.getAño(),
+                    dias.getUsuario() != null ? dias.getUsuario().getId() : null  // Obtener usuario_id
             );
             solicitudesDTO.add(dto);
         }

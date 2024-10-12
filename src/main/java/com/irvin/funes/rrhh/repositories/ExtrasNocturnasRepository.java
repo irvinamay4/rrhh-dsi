@@ -8,4 +8,6 @@ import java.util.List;
 public interface ExtrasNocturnasRepository extends CrudRepository<ExtrasNocturnas,Long> {
     // Método para encontrar extras nocturnas por ID del usuario
     List<ExtrasNocturnas> findByUsuarioId(Long usuarioId);
+    ExtrasNocturnas findByUsuarioIdAndMesAndAño(Long usuarioId, String mes, String año);
+
 }

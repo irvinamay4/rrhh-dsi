@@ -8,4 +8,6 @@ import java.util.List;
 public interface ExtrasDiurnasRepository extends CrudRepository<ExtrasDiurnas,Long>{
     // Método para encontrar extras diurnas por ID del usuario
     List<ExtrasDiurnas> findByUsuarioId(Long usuarioId);
+    ExtrasDiurnas findByUsuarioIdAndMesAndAño(Long usuarioId, String mes, String año);
+
 }

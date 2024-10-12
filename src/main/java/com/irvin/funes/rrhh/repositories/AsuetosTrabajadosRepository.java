@@ -11,4 +11,6 @@ public interface AsuetosTrabajadosRepository extends CrudRepository<AsuetoTrabaj
 
     // Método para encontrar asuetos trabajados por ID del usuario
     List<AsuetoTrabajadoDiasUsuario> findByUsuarioId(Long usuarioId);
+    AsuetoTrabajadoDiasUsuario findByUsuarioIdAndMesAndAño(Long usuarioId, String mes, String año);
+
 }

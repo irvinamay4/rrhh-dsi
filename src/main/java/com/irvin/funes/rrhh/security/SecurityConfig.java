@@ -71,6 +71,12 @@ public class SecurityConfig {
                     auth.requestMatchers("/solicitudes").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/asuetos-trabajados").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/carga-laboral-diurna").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/usuario/{usuarioId}/mes/{mes}/año/{año}").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/usuario/{usuarioId}/mes/{mes}/año/{año}").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/incapadidad-dias-usuario").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/vacaciones-dias-usuario").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/extras-diurnas").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/extras-nocturnas").hasAnyRole("ADMIN", "RRHH");
                     // Otras rutas con restricciones
                     auth.requestMatchers("/usuarios").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/usuarios{id}").hasAnyRole("ADMIN", "RRHH", "USER");
@@ -83,6 +89,15 @@ public class SecurityConfig {
                     auth.requestMatchers("/asuetos-trabajados/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/carga-laboral-diurna/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/carga-laboral-diurna/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/extras-diurnas/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/extras-diurnas/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/extras-nocturnas/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/extras-nocturnas/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/incapadidad-dias-usuario/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/incapadidad-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/vacaciones-dias-usuario/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/vacaciones-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+
 
 
                     // Cualquier otra petición debe estar autenticada
