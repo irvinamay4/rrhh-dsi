@@ -164,6 +164,7 @@ public class UsuarioController {
             usuarioDb.setSalario(usuario.getSalario());
             usuarioDb.setHorasDiurnas(usuario.getHorasDiurnas());
             usuarioDb.setHorasNocturnas(usuario.getHorasNocturnas());
+            usuarioDb.setEstado(usuario.getEstado());
 
             //double dias_descontados = usuario.getDias_descontados() * ((   (Double.parseDouble(usuario.getSalario())) / 30) / 8);
 
