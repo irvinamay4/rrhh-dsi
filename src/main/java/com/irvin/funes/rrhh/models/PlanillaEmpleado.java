@@ -18,8 +18,8 @@ public class PlanillaEmpleado {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private  double horasEDiurnas;
-    private  double horasENocturnas;
+    private  double horasEDiurnas;//
+    private  double horasENocturnas;//
     private String nombreEmpleado;
     private String cargoEmpleado;
     private String duiEmpleado;
@@ -27,18 +27,19 @@ public class PlanillaEmpleado {
     private String fechaFin;
     private double salarioBase;
     private double salarioDia;
-    private int diasLaborados;
-    private int diasAusentes;
-    private int incapacidades;
-    private double vacaciones;
-    private double asuetos;
-    private double totalDevengado;
-    private double descuetoAfp;
-    private double descuentoIsss;
-    private double descuentoRenta;
-    private double totalDescuentos;
-    private double liquidoPagar;
+    private double diasLaborados;
+    private double diasAusentes;//
+    private double incapacidades;//
+    private double vacaciones;//
+    private double asuetos;//
+    private double totalDevengado;//
+    private double descuetoAfp;//
+    private double descuentoIsss;//
+    private double descuentoRenta;//
+    private double totalDescuentos;//
+    private double liquidoPagar;//
     private String mes;
+    private String anio;
 
     //agregar horas y dias descontados...
 

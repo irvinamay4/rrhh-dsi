@@ -75,6 +75,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/usuario/{usuarioId}/mes/{mes}/año/{año}").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/incapadidad-dias-usuario").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/vacaciones-dias-usuario").hasAnyRole("ADMIN", "RRHH");
+                    auth.requestMatchers("/ausencia-dias-usuario").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/extras-diurnas").hasAnyRole("ADMIN", "RRHH");
                     auth.requestMatchers("/extras-nocturnas").hasAnyRole("ADMIN", "RRHH");
                     // Otras rutas con restricciones
@@ -97,6 +98,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/incapadidad-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/vacaciones-dias-usuario/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/vacaciones-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("//ausencia-dias-usuario/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/ausencia-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
 
 
 

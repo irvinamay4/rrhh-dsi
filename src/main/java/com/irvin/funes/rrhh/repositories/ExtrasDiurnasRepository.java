@@ -10,4 +10,5 @@ public interface ExtrasDiurnasRepository extends CrudRepository<ExtrasDiurnas,Lo
     List<ExtrasDiurnas> findByUsuarioId(Long usuarioId);
     ExtrasDiurnas findByUsuarioIdAndMesAndAño(Long usuarioId, String mes, String año);
 
+
 }

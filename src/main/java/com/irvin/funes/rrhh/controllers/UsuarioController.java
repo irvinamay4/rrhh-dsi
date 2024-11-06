@@ -48,6 +48,9 @@ public class UsuarioController {
     @Autowired
     private VacacionesDiasUsuariosRepository vacacionesDiasUsuariosRepository;
 
+    @Autowired
+    private AusenciaDiaUsuarioRepository ausenciaDiaUsuarioRepository;
+
 
     @GetMapping
     public List<Usuario> listar(){
@@ -733,6 +736,77 @@ public class UsuarioController {
                     dias.getFecha_inicio(),
                     dias.getFecha_fin(),
                     dias.getCantidad_dias(),
+                    dias.getMes(),
+                    dias.getAño(),
+                    dias.getUsuario() != null ? dias.getUsuario().getId() : null  // Obtener usuario_id
+            );
+            solicitudesDTO.add(dto);
+        }
+
+        return new ResponseEntity<>(solicitudesDTO, HttpStatus.OK);
+    }
+
+    //Ausencias Dias Usuario ************************************************************************************************
+    @GetMapping("/ausencia-dias-usuario/consultar/usuario/{usuarioId}")
+    public ResponseEntity<?> listarAusenciasDiasPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
+        List<AusenciaDiaUsuario> ausenciaDiaUsuarios = ausenciaDiaUsuarioRepository.findByUsuarioId(usuarioId);
+        System.out.println("ENTROROOOOOOOOO");
+        if (!ausenciaDiaUsuarios.isEmpty()) {
+            System.out.println("ENTROROOOOOOOOO");
+            return ResponseEntity.ok().body(ausenciaDiaUsuarios);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/ausencia-dias-usuario/crear/{id}")
+    public ResponseEntity<?> crearAusenciaDias(@Valid @RequestBody AusenciaDiaUsuario ausenciaDiaUsuario, BindingResult result, @PathVariable Long id) {
+        if (result.hasErrors()) {
+            return validar(result);
+        }
+
+        Optional<Usuario> o = service.porId(id);
+        if (o.isPresent()) {
+            Usuario usuario = o.get();
+            Set<AusenciaDiaUsuario> ausenciaDiaUsuarioSet = usuario.getAusenciaDiaUsuarios();
+
+            // Buscar si ya existe un registro con el mismo mes y año
+            Optional<AusenciaDiaUsuario> existingDias = ausenciaDiaUsuarioSet.stream()
+                    .filter(a -> a.getMes().equals(ausenciaDiaUsuario.getMes()) && a.getAño().equals(ausenciaDiaUsuario.getAño()))
+                    .findFirst();
+
+            if (existingDias.isPresent()) {
+                // Acumular dias si ya existe
+                AusenciaDiaUsuario incapacidadDiasAcumulado = existingDias.get();
+                incapacidadDiasAcumulado.setCantidad_horas(incapacidadDiasAcumulado.getCantidad_horas() + ausenciaDiaUsuario.getCantidad_horas());
+            } else {
+                // Crear nuevo registro si no existe
+                ausenciaDiaUsuario.setUsuario(usuario);
+                ausenciaDiaUsuarioSet.add(ausenciaDiaUsuario);
+            }
+
+            usuario.setAusenciaDiaUsuarios(ausenciaDiaUsuarioSet);
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(usuario));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+    //ARREGLAR QUE NO TRAE EL ID_USUARIO... NO LO TRAE PORQUE ES UN CAMPO QUE CREA EN LA TABLA DIRECTAMENTE
+    @GetMapping("/ausencia-dias-usuario")
+    public ResponseEntity<List<AusenciaDiaUsuarioDto>> listaAusenciasDias() {
+        List<AusenciaDiaUsuario> ausenciaDiaUsuarios = new ArrayList<AusenciaDiaUsuario>();
+        ausenciaDiaUsuarioRepository.findAll().forEach(ausenciaDiaUsuarios::add);
+
+        if (ausenciaDiaUsuarios.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        // Convertir las entidades en DTO
+        List<AusenciaDiaUsuarioDto> solicitudesDTO = new ArrayList<>();
+        for (AusenciaDiaUsuario dias : ausenciaDiaUsuarios) {
+            AusenciaDiaUsuarioDto dto = new AusenciaDiaUsuarioDto(
+                    dias.getId(),
+                    dias.getCantidad_horas(),
                     dias.getMes(),
                     dias.getAño(),
                     dias.getUsuario() != null ? dias.getUsuario().getId() : null  // Obtener usuario_id
