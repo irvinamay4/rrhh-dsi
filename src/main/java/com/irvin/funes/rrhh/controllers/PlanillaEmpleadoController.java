@@ -3,10 +3,7 @@ package com.irvin.funes.rrhh.controllers;
 import com.irvin.funes.rrhh.dtos.PlanillaEmpleadoDto;
 import com.irvin.funes.rrhh.dtos.SolicitudesDiasLibresDto;
 import com.irvin.funes.rrhh.exception.ResourceNotFoundException;
-import com.irvin.funes.rrhh.models.PlanillaEmpleado;
-import com.irvin.funes.rrhh.models.SolicitudesDiasLibres;
-import com.irvin.funes.rrhh.models.Usuario;
-import com.irvin.funes.rrhh.models.VacacionesDiasUsuario;
+import com.irvin.funes.rrhh.models.*;
 import com.irvin.funes.rrhh.repositories.*;
 import com.irvin.funes.rrhh.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -86,18 +83,30 @@ public class PlanillaEmpleadoController {
         planillaDto.setFechaInicio(mes + "/01/" + anio);
         planillaDto.setFechaFin(mes + "/30/" + anio);  // o ajustar según el mes
 
+        double horasExtrasDiurnas = 0;
+
         // 1. Pago de horas extras diurnas
-        double horasExtrasDiurnas = extrasDiurnasRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        ExtrasDiurnas extrasDiurnas = extrasDiurnasRepository.findByUsuarioIdAndMesAndAño(id, mes, anio);
+        if (extrasDiurnas != null) {
+            horasExtrasDiurnas = extrasDiurnas.getCantidad_horas();
+        }
         double pagoHorasEDiurnas = salarioHora * 2 * horasExtrasDiurnas;
         planillaDto.setHorasEDiurnas(pagoHorasEDiurnas);
 
         // 2. Pago de horas extras nocturnas
-        double horasExtrasNocturnas = extrasNocturnasRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        double horasExtrasNocturnas =0;
+        ExtrasNocturnas extrasNocturnas = extrasNocturnasRepository.findByUsuarioIdAndMesAndAño(id, mes, anio);
+        if (extrasNocturnas != null) {
+            horasExtrasNocturnas = extrasNocturnas.getCantidad_horas();
+        }
         double pagoHorasENocturnas = salarioHora * 2.5 * horasExtrasNocturnas;
         planillaDto.setHorasENocturnas(pagoHorasENocturnas);
 
         // 3. Pago por asueto trabajado
-        double horasAsueto = asuetosTrabajadosRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        double horasAsueto=0;
+        if(asuetosTrabajadosRepository.findByUsuarioIdAndMesAndAño(id, mes, anio)!=null){
+            horasAsueto = asuetosTrabajadosRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        }
         double pagoAsuetos = salarioHora * 2 * horasAsueto;
         planillaDto.setAsuetos(pagoAsuetos);
 
@@ -112,7 +121,11 @@ public class PlanillaEmpleadoController {
         }
 
         // 5. Descuento por incapacidad (si es mayor a 3 días)
-        diasIncapacidad = incapacidadDiasUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_dias();
+
+        if (incapacidadDiasUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio) != null) {
+            diasIncapacidad = incapacidadDiasUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_dias();
+        }
+
         double descuentoIncapacidad = 0;
         if (diasIncapacidad > 3) {
             descuentoIncapacidad = (diasIncapacidad - 3) * salarioDia;
@@ -122,7 +135,10 @@ public class PlanillaEmpleadoController {
         }
 
         // 6. Descuento de ausencia
-        horasAusentes = ausenciaDiaUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        if (ausenciaDiaUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio) != null) {
+            horasAusentes = ausenciaDiaUsuarioRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas();
+        }
+
         double descuentoAusencia = horasAusentes * salarioHora;
         planillaDto.setDiasAusentes(horasAusentes);
 
