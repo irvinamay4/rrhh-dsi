@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,4 +17,8 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
     Optional<Usuario> porEmail(String email); //Forma por query
 
     boolean existsByEmail(String email);//Forma por palabra clave, es mas eficiente porque solo valida si existe, no busca todo el objeto
+
+    List<Usuario> findAll();
+
+
 }

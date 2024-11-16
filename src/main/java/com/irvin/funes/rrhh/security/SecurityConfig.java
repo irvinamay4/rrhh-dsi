@@ -100,6 +100,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/vacaciones-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("//ausencia-dias-usuario/consultar/usuario/{usuarioId}").hasAnyRole("ADMIN", "RRHH", "USER");
                     auth.requestMatchers("/ausencia-dias-usuario/crear/{id}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/planilla/crear/{id}/mes/{mes}/anio/{anio}").hasAnyRole("ADMIN", "RRHH", "USER");
+                    auth.requestMatchers("/planillas/crear/mes/{mes}/anio/{anio}").hasAnyRole("ADMIN", "RRHH", "USER");
 
 
 
