@@ -167,7 +167,11 @@ public class PlanillaEmpleadoController {
         planillaDto.setLiquidoPagar(liquidoPagar);
 
         // Calcular días laborados
-        double diasLaborados = 30 - (horasAusentes/8);
+        double diasLaborados = 0;
+        if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(id, mes, anio) != null) {
+             diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas())/8;
+             diasLaborados = diasLaborados - (horasAusentes/8);
+        }
         planillaDto.setDiasLaborados(diasLaborados);
 
         // Guardar la planilla en la base de datos
@@ -317,7 +321,11 @@ public class PlanillaEmpleadoController {
             planillaDto.setLiquidoPagar(liquidoPagar);
 
             // Calcular días laborados
-            double diasLaborados = 30 - (horasAusentes / 8);
+            double diasLaborados = 0;
+            if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio) != null) {
+                diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio).getCantidad_horas())/8;
+                diasLaborados = diasLaborados - (horasAusentes/8);
+            }
             planillaDto.setDiasLaborados(diasLaborados);
 
             // Guardar la planilla en la base de datos
