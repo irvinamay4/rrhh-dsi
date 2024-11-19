@@ -358,7 +358,7 @@ public class PlanillaEmpleadoController {
             planillasGeneradas.add(planilla);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(planillasGeneradas);
+        return ResponseEntity.status(HttpStatus.CREATED).body("PLANILLAS GENERADAS");
     }
 
 
