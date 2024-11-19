@@ -142,9 +142,17 @@ public class PlanillaEmpleadoController {
         double descuentoAusencia = horasAusentes * salarioHora;
         planillaDto.setDiasAusentes(descuentoAusencia);
 
+        // Calcular días laborados
+        double diasLaborados = 0;
+        if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio) != null) {
+            diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio).getCantidad_horas())/8;
+            diasLaborados = diasLaborados - (horasAusentes/8);
+        }
+        planillaDto.setDiasLaborados(diasLaborados);
+
         // 7. Total devengado
         double totalDevengado = salarioBase + pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia;
-        planillaDto.setTotalDevengado(totalDevengado);
+        planillaDto.setTotalDevengado((diasLaborados * salarioDia)+ pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia);
 
         // 8. Descuento AFP
         double descuentoAfp = totalDevengado * 0.0725;
@@ -166,13 +174,6 @@ public class PlanillaEmpleadoController {
         double liquidoPagar = totalDevengado - totalDescuentos;
         planillaDto.setLiquidoPagar(liquidoPagar);
 
-        // Calcular días laborados
-        double diasLaborados = 0;
-        if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(id, mes, anio) != null) {
-             diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(id, mes, anio).getCantidad_horas())/8;
-             diasLaborados = diasLaborados - (horasAusentes/8);
-        }
-        planillaDto.setDiasLaborados(diasLaborados);
 
         // Guardar la planilla en la base de datos
         PlanillaEmpleado planilla = new PlanillaEmpleado();
@@ -186,7 +187,7 @@ public class PlanillaEmpleadoController {
         planilla.setSalarioBase(planillaDto.getSalarioBase());
         planilla.setSalarioDia(planillaDto.getSalarioDia());
         planilla.setDiasLaborados(planillaDto.getDiasLaborados());
-        planilla.setDiasAusentes(planillaDto.getDiasAusentes());
+        planilla.setHorasAusentes(planillaDto.getDiasAusentes());
         planilla.setIncapacidades(planillaDto.getIncapacidades());
         planilla.setVacaciones(planillaDto.getVacaciones());
         planilla.setAsuetos(planillaDto.getAsuetos());
@@ -296,9 +297,17 @@ public class PlanillaEmpleadoController {
             double descuentoAusencia = horasAusentes * salarioHora;
             planillaDto.setDiasAusentes(horasAusentes);
 
+            // Calcular días laborados
+            double diasLaborados = 0;
+            if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio) != null) {
+                diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio).getCantidad_horas())/8;
+                diasLaborados = diasLaborados - (horasAusentes/8);
+            }
+            planillaDto.setDiasLaborados(diasLaborados);
+
             // 7. Total devengado
             double totalDevengado = salarioBase + pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia;
-            planillaDto.setTotalDevengado(totalDevengado);
+            planillaDto.setTotalDevengado((diasLaborados * salarioDia)+ pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia);
 
             // 8. Descuento AFP
             double descuentoAfp = totalDevengado * 0.0725;
@@ -320,13 +329,7 @@ public class PlanillaEmpleadoController {
             double liquidoPagar = totalDevengado - totalDescuentos;
             planillaDto.setLiquidoPagar(liquidoPagar);
 
-            // Calcular días laborados
-            double diasLaborados = 0;
-            if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio) != null) {
-                diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio).getCantidad_horas())/8;
-                diasLaborados = diasLaborados - (horasAusentes/8);
-            }
-            planillaDto.setDiasLaborados(diasLaborados);
+
 
             // Guardar la planilla en la base de datos
             PlanillaEmpleado planilla = new PlanillaEmpleado();
@@ -340,7 +343,7 @@ public class PlanillaEmpleadoController {
             planilla.setSalarioBase(planillaDto.getSalarioBase());
             planilla.setSalarioDia(planillaDto.getSalarioDia());
             planilla.setDiasLaborados(planillaDto.getDiasLaborados());
-            planilla.setDiasAusentes(planillaDto.getDiasAusentes());
+            planilla.setHorasAusentes(planillaDto.getDiasAusentes());
             planilla.setIncapacidades(planillaDto.getIncapacidades());
             planilla.setVacaciones(planillaDto.getVacaciones());
             planilla.setAsuetos(planillaDto.getAsuetos());

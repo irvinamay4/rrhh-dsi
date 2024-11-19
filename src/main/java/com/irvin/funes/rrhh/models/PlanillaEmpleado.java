@@ -28,7 +28,7 @@ public class PlanillaEmpleado {
     private double salarioBase;
     private double salarioDia;
     private double diasLaborados;
-    private double diasAusentes;//
+    private double horasAusentes;//
     private double incapacidades;//
     private double vacaciones;//
     private double asuetos;//
