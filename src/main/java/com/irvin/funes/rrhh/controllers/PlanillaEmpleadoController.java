@@ -146,12 +146,12 @@ public class PlanillaEmpleadoController {
         double diasLaborados = 0;
         if (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio) != null) {
             diasLaborados = (cargaLaboralDiurnaRepository.findByUsuarioIdAndMesAndAño(usuario.getId(), mes, anio).getCantidad_horas())/8;
-            diasLaborados = diasLaborados - (horasAusentes/8);
+            //diasLaborados = diasLaborados - (horasAusentes/8);
         }
         planillaDto.setDiasLaborados(diasLaborados);
 
         // 7. Total devengado
-        double totalDevengado = salarioBase + pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia;
+        double totalDevengado = salarioBase + pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad;// - descuentoAusencia;
         planillaDto.setTotalDevengado((diasLaborados * salarioDia)+ pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia);
 
         // 8. Descuento AFP
