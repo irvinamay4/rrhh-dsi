@@ -152,7 +152,7 @@ public class PlanillaEmpleadoController {
 
         // 7. Total devengado
         double totalDevengado = salarioBase + pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad;// - descuentoAusencia;
-        planillaDto.setTotalDevengado((diasLaborados * salarioDia)+ pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad - descuentoAusencia);
+        planillaDto.setTotalDevengado((diasLaborados * salarioDia)+ pagoHorasEDiurnas + pagoHorasENocturnas + pagoAsuetos - descuentoIncapacidad);// - descuentoAusencia);
 
         // 8. Descuento AFP
         double descuentoAfp = totalDevengado * 0.0725;
